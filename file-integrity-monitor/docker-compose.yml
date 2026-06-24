@@ -1,0 +1,7 @@
+services:
+  file-integrity-monitor:
+    build: .
+    container_name: file-integrity-monitor
+    volumes:
+      - ./monitored:/app/monitored
+      - ./reports:/app/reports
