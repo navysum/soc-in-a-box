@@ -1,2 +1,5 @@
 {"timestamp": "2026-06-25 11:24:57", "event_type": "CREATED", "severity": "INFO", "path": "/app/monitored/test.txt", "destination": null, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
 {"timestamp": "2026-06-25 11:24:58", "event_type": "DELETED", "severity": "CRITICAL", "path": "/app/monitored/test.txt", "destination": null, "sha256": null}
+{"timestamp": "2026-06-25 11:32:03", "event_type": "CREATED", "severity": "INFO", "path": "/app/monitored/test.txt", "destination": null, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+{"timestamp": "2026-06-25 11:32:05", "event_type": "MODIFIED", "severity": "WARNING", "path": "/app/monitored/test.txt", "destination": null, "sha256": "cd2eca3535741f27a8ae40c31b0c41d4057a7a7b912b33b9aed86485d1c84676"}
+{"timestamp": "2026-06-25 11:32:07", "event_type": "DELETED", "severity": "CRITICAL", "path": "/app/monitored/test.txt", "destination": null, "sha256": null}

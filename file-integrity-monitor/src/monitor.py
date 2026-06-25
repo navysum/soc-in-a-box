@@ -52,24 +52,34 @@ class FileIntegrityHandler(FileSystemEventHandler):
         if os.path.isdir(path):
             return
 
+        timestamp = get_timestamp()
+        file_hash = calculate_sha256(path)
+
         event_data = {
-            "timestamp": get_timestamp(),
+            "timestamp": timestamp,
             "event_type": event_type,
             "severity": get_severity(event_type),
             "path": path,
             "destination": destination,
-            "sha256": calculate_sha256(path),
+            "sha256": file_hash,
         }
 
         save_event(event_data)
 
-        print(
-            f"[{event_data['timestamp']}] "
+        message = (
+            f"[{timestamp}] "
             f"[{event_data['severity']}] "
             f"[{event_type}] "
-            f"{path}",
-            flush=True,
+            f"{path}"
         )
+
+        if destination:
+            message += f" -> {destination}"
+
+        if file_hash:
+            message += f" | SHA256: {file_hash[:12]}..."
+
+        print(message, flush=True)
 
     def on_created(self, event):
         if not event.is_directory:
