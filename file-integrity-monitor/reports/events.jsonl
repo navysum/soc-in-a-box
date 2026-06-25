@@ -1,0 +1,2 @@
+{"timestamp": "2026-06-25 11:24:57", "event_type": "CREATED", "severity": "INFO", "path": "/app/monitored/test.txt", "destination": null, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+{"timestamp": "2026-06-25 11:24:58", "event_type": "DELETED", "severity": "CRITICAL", "path": "/app/monitored/test.txt", "destination": null, "sha256": null}

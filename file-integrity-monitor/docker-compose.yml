@@ -5,3 +5,6 @@ services:
     volumes:
       - ./monitored:/app/monitored
       - ./reports:/app/reports
+    environment:
+      - MONITORED_PATH=/app/monitored
+      - REPORTS_PATH=/app/reports
