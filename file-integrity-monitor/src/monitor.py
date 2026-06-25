@@ -93,7 +93,7 @@ def main():
     os.makedirs(REPORTS_PATH, exist_ok=True)
 
     event_handler = FileIntegrityHandler()
-    observer = Observer()
+    observer = Observer(timeout=0.5)
     observer.schedule(event_handler, MONITORED_PATH, recursive=True)
     observer.start()
 
