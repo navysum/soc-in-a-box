@@ -2,6 +2,7 @@ from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler
 from baseline import build_baseline, save_baseline, load_baseline, calculate_sha256
 from checker import check_integrity
+from report import generate_summary_report
 from datetime import datetime
 import argparse
 import json
@@ -13,6 +14,7 @@ MONITORED_PATH = os.getenv("MONITORED_PATH", "monitored")
 REPORTS_PATH = os.getenv("REPORTS_PATH", "reports")
 EVENT_LOG_FILE = os.path.join(REPORTS_PATH, "events.jsonl")
 BASELINE_FILE = os.path.join(REPORTS_PATH, "baseline.json")
+SUMMARY_REPORT_FILE = os.path.join(REPORTS_PATH, "summary.md")
 
 
 def get_timestamp():
@@ -116,6 +118,11 @@ def main():
         action="store_true",
         help="Check current files against the trusted baseline",
     )
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        help="Generate a Markdown integrity summary report",
+    )
 
     args = parser.parse_args()
 
@@ -139,6 +146,15 @@ def main():
                 flush=True,
             )
 
+        return
+
+    if args.report:
+        report_file = generate_summary_report(
+            MONITORED_PATH,
+            BASELINE_FILE,
+            SUMMARY_REPORT_FILE,
+        )
+        print(f"Summary report generated: {report_file}", flush=True)
         return
 
     event_handler = FileIntegrityHandler()

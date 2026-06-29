@@ -2,9 +2,21 @@
 
 A cybersecurity portfolio project that simulates core Security Operations Centre capabilities.
 
-## Current Components
+## Components
 
-- File Integrity Monitor
+### File Integrity Monitor
+
+A Python and Docker-based tool that monitors files for unauthorized changes.
+
+Current features:
+
+- Live file monitoring
+- SHA-256 hashing
+- Trusted baseline creation
+- Baseline mismatch detection
+- JSON event logging
+- One-time integrity checks
+- Markdown summary reports
 
 ## Planned Components
 
@@ -18,8 +30,9 @@ A cybersecurity portfolio project that simulates core Security Operations Centre
 - Docker
 - GitHub
 - PowerShell
-- Linux containers
+- JSON
+- Markdown
 
-## Project Status
+## Status
 
 In development.
