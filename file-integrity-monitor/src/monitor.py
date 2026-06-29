@@ -1,6 +1,7 @@
 from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler
 from baseline import build_baseline, save_baseline, load_baseline, calculate_sha256
+from checker import check_integrity
 from datetime import datetime
 import argparse
 import json
@@ -110,6 +111,11 @@ def main():
         action="store_true",
         help="Create a trusted baseline of current file hashes",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Check current files against the trusted baseline",
+    )
 
     args = parser.parse_args()
 
@@ -120,6 +126,19 @@ def main():
         baseline = build_baseline(MONITORED_PATH)
         save_baseline(baseline, BASELINE_FILE)
         print(f"Baseline saved to: {BASELINE_FILE}", flush=True)
+        return
+
+    if args.check:
+        results = check_integrity(MONITORED_PATH, BASELINE_FILE)
+
+        for result in results:
+            print(
+                f"[{result['severity']}] "
+                f"{result['status']} "
+                f"{result['path']}",
+                flush=True,
+            )
+
         return
 
     event_handler = FileIntegrityHandler()
