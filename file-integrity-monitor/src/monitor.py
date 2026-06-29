@@ -1,5 +1,7 @@
 from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler
+from baseline import build_baseline, save_baseline, load_baseline
+import argparse
 from datetime import datetime
 import hashlib
 import json
@@ -10,6 +12,7 @@ import os
 MONITORED_PATH = os.getenv("MONITORED_PATH", "monitored")
 REPORTS_PATH = os.getenv("REPORTS_PATH", "reports")
 EVENT_LOG_FILE = os.path.join(REPORTS_PATH, "events.jsonl")
+BASELINE_FILE = os.path.join(REPORTS_PATH, "baseline.json")
 
 
 def get_timestamp():
@@ -99,8 +102,23 @@ class FileIntegrityHandler(FileSystemEventHandler):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="File Integrity Monitor")
+    parser.add_argument(
+        "--init-baseline",
+        action="store_true",
+        help="Create a trusted baseline of current file hashes",
+    )
+
+    args = parser.parse_args()
+
     os.makedirs(MONITORED_PATH, exist_ok=True)
     os.makedirs(REPORTS_PATH, exist_ok=True)
+
+    if args.init_baseline:
+        baseline = build_baseline(MONITORED_PATH)
+        save_baseline(baseline, BASELINE_FILE)
+        print(f"Baseline saved to: {BASELINE_FILE}", flush=True)
+        return
 
     event_handler = FileIntegrityHandler()
     observer = Observer(timeout=0.5)
@@ -109,6 +127,7 @@ def main():
 
     print(f"Monitoring folder: {MONITORED_PATH}", flush=True)
     print(f"Saving reports to: {EVENT_LOG_FILE}", flush=True)
+    print(f"Using baseline file: {BASELINE_FILE}", flush=True)
     print("Press Ctrl+C to stop.", flush=True)
 
     try:
