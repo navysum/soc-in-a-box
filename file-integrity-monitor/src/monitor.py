@@ -1,6 +1,6 @@
+from baseline import build_baseline, save_baseline, load_baseline
 from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler
-from baseline import build_baseline, save_baseline, load_baseline
 import argparse
 from datetime import datetime
 import hashlib
