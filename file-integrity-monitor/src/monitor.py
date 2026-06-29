@@ -1,9 +1,8 @@
-from baseline import build_baseline, save_baseline, load_baseline
 from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler
-import argparse
+from baseline import build_baseline, save_baseline, load_baseline, calculate_sha256
 from datetime import datetime
-import hashlib
+import argparse
 import json
 import time
 import os
@@ -19,25 +18,11 @@ def get_timestamp():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def calculate_sha256(file_path):
-    try:
-        sha256 = hashlib.sha256()
-
-        with open(file_path, "rb") as file:
-            for block in iter(lambda: file.read(4096), b""):
-                sha256.update(block)
-
-        return sha256.hexdigest()
-
-    except FileNotFoundError:
-        return None
-    except PermissionError:
-        return "PERMISSION_DENIED"
-
-
-def get_severity(event_type):
-    if event_type == "DELETED":
+def get_severity(event_type, integrity_status=None):
+    if integrity_status in ["BASELINE_MISMATCH", "FILE_DELETED"]:
         return "CRITICAL"
+    if integrity_status == "NEW_FILE_NOT_IN_BASELINE":
+        return "WARNING"
     if event_type in ["MODIFIED", "MOVED"]:
         return "WARNING"
     return "INFO"
@@ -56,25 +41,42 @@ class FileIntegrityHandler(FileSystemEventHandler):
             return
 
         timestamp = get_timestamp()
-        file_hash = calculate_sha256(path)
+
+        try:
+            file_hash = calculate_sha256(path)
+        except FileNotFoundError:
+            file_hash = None
+        except PermissionError:
+            file_hash = "PERMISSION_DENIED"
+
+        baseline = load_baseline(BASELINE_FILE)
+        expected_hash = baseline.get(path)
+
+        if event_type == "DELETED":
+            integrity_status = "FILE_DELETED"
+        elif expected_hash is None:
+            integrity_status = "NEW_FILE_NOT_IN_BASELINE"
+        elif expected_hash == file_hash:
+            integrity_status = "MATCHES_BASELINE"
+        else:
+            integrity_status = "BASELINE_MISMATCH"
+
+        severity = get_severity(event_type, integrity_status)
 
         event_data = {
             "timestamp": timestamp,
             "event_type": event_type,
-            "severity": get_severity(event_type),
+            "severity": severity,
+            "integrity_status": integrity_status,
             "path": path,
             "destination": destination,
-            "sha256": file_hash,
+            "expected_sha256": expected_hash,
+            "actual_sha256": file_hash,
         }
 
         save_event(event_data)
 
-        message = (
-            f"[{timestamp}] "
-            f"[{event_data['severity']}] "
-            f"[{event_type}] "
-            f"{path}"
-        )
+        message = f"[{timestamp}] [{severity}] [{event_type}] {path} [{integrity_status}]"
 
         if destination:
             message += f" -> {destination}"
