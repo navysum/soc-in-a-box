@@ -1,12 +1,14 @@
 from parser import parse_log_file
 from analyzer import summarize_events
 from detector import run_detections
+from reporter import generate_markdown_report
 import argparse
 import json
 import os
 
 
-REPORT_PATH = "reports/summary.json"
+JSON_REPORT_PATH = "reports/summary.json"
+MARKDOWN_REPORT_PATH = "reports/summary.md"
 
 
 def main():
@@ -26,11 +28,14 @@ def main():
 
     os.makedirs("reports", exist_ok=True)
 
-    with open(REPORT_PATH, "w", encoding="utf-8") as report:
+    with open(JSON_REPORT_PATH, "w", encoding="utf-8") as report:
         json.dump(report_data, report, indent=4)
 
+    markdown_report = generate_markdown_report(report_data, MARKDOWN_REPORT_PATH)
+
     print(json.dumps(report_data, indent=4), flush=True)
-    print(f"Report saved to: {REPORT_PATH}", flush=True)
+    print(f"JSON report saved to: {JSON_REPORT_PATH}", flush=True)
+    print(f"Markdown report saved to: {markdown_report}", flush=True)
 
 
 if __name__ == "__main__":
